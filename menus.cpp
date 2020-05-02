@@ -8,80 +8,48 @@
 #define DERECHA 4
 
 
-/* MainMenu = 0
- escenas = 1
- other = 2
-*/
-const char *mainMenu[] = {"Escenas","Other"};
-const char *menuScenas[] = {"INTRO","DOA","Overwatch", "Apex", "BleedingEdge"};
-const int mapEscenas[] = {KEY_F1,KEY_F2,KEY_F3,KEY_F4,KEY_F5};
-int currentMenu = 0;
-int currentEscena = 0;
+const char *mainGames[] = {"DOA","Overwatch","Apex", "BleedingEdge", "Naruto" ,"Other"};
+const char *menuScenas[] = {"INTRO","GAME"};
+int currentGame = -1;
+int currentEscena = -1;
 
-void showMainMenu(){
+void showMenuEscenasGames(){
     bool exit = false;
-    int index = currentMenu;
+    int indexGame = 0;
+    int indexEscena = 0;
     Serial.println("Enter principal");
-    int next_id = 0;
-    while(!exit){
-        next_id = index % (sizeof(mainMenu)/sizeof(char *));
-        Serial.println(next_id);
-        String aux = String(mainMenu[next_id]);
-        printlcd(0, aux);
+    while(true){ //loop inside menu
+        int nextGame = indexGame % (sizeof(mainGames)/sizeof(char *));
+        int nextEscena = indexEscena % (sizeof(menuScenas)/sizeof(char *));
+        generateMenu(nextGame, nextEscena);
         delay(200);
         int pulsacion = getPulsacion();
-        if(pulsacion == DERECHA) index += 1;
-        else if(pulsacion == IZQDA) index -= 1;
-        else if(pulsacion == ARRIBA) exit = true;
-        else if(pulsacion == SELECT) enterSubMenu(next_id);
-    }
-    currentMenu = next_id;
-    Serial.println("exit principal");
-}
-
-void enterSubMenu(int index){
-    switch(index){
-        case 0: //enter Escenas menu
-            showMenuEscenas();
-            break;
-        default:
-            return;
+        if(pulsacion == DERECHA) indexEscena += 1;
+        else if(pulsacion == IZQDA) indexEscena -= 1;
+        else if(pulsacion == ARRIBA) indexGame += 1;
+        else if(pulsacion == ABAJO) indexGame -= 1;
+        else if(pulsacion == SELECT){
+            //save la seleccion
+            currentGame = nextGame;
+            currentEscena = nextEscena;
+            sendCommand(nextGame, nextEscena);
+        }
     }
 }
 
-void showMenuEscenas(){
-    bool exit = false;
-    int index = currentEscena;
-    Serial.println("Enter escenas");
-    int next_id = 0;
-    while(!exit){
-        next_id = index % (sizeof(menuScenas)/sizeof(char *));
-        Serial.println(next_id);
-        String aux = String(menuScenas[next_id]);
-        printlcd(0, aux);
-        delay(200);
-        int pulsacion = getPulsacion();
-        if(pulsacion == DERECHA) index += 1;
-        else if(pulsacion == IZQDA) index -= 1;
-        else if(pulsacion == ARRIBA) exit = true;
-        else if(pulsacion == SELECT) changeEscena(next_id);
-    }
-    currentEscena = next_id;
-    Serial.println("Exit escenas");
+void generateMenu(int nextGame, int nextEscena){
+    String gameToPrint = String(mainGames[nextGame]);
+    String sceneToPrint = String(menuScenas[nextEscena]);
+    Serial.println(gameToPrint);
+    Serial.println(sceneToPrint);
+    bool isSelected = nextGame == currentGame && nextEscena == currentEscena;
+    printlcd(0, gameToPrint, false, false);
+    printlcd(1, sceneToPrint, true, isSelected);
 }
 
-void changeEscena(int id){
-    //keyboard_press(mapEscenas[id]);
-}
-
-void getCurrentEscena(){
-
-}
-void getNextEscena(){
-
-}
-void getNextItemMainMenu(){
-
+void sendCommand(int game, int escena){
+    Serial.println(game);
+    Serial.println(escena);
 }
 
 int getPulsacion(){

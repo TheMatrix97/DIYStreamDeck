@@ -1,10 +1,5 @@
 #include <Arduino.h>
-#include <Keyboard.h>
-void showMainMenu();
-void changeEscena(int);
-void showMenuEscenas();
-void getCurrentEscena();
-void getNextEscena();
-void getNextItemMainMenu();
-void enterSubMenu(int index);
+void showMenuEscenasGames();
+void sendCommand(int game, int escena);
 int getPulsacion();
+void generateMenu(int, int);

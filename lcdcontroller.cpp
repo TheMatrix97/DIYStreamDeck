@@ -1,20 +1,30 @@
 #include <LiquidCrystal.h>
 #include "lcdcontroller.h"
 
+#define LinesLCD 2
+#define RowLCD 16
+
 int rs = 8, en = 9, d4 = 4, d5 = 5, d6 = 6, d7 = 7;
 LiquidCrystal lcd(rs, en, d4, d5, d6, d7);
-void setup_lcd(){ //Start lcd
-    lcd.begin(16, 2);
+
+void setup_lcd(){
+    lcd.begin(RowLCD, LinesLCD);
     lcd.noBlink();
-    //lcd.autoscroll();
 }
 
-void printlcd(int fila, String aux){
+void printlcd(int fila, String aux, bool isScene, bool isSelected){
+    if(isScene && !isSelected) aux = aux + "[]";
+    else if(isScene && isSelected) aux = aux + "[X]";
+    Serial.println(aux);
     int size = aux.length();
-    int total = 16;
-    lcd.clear();
-    lcd.setCursor((16-size)/2,fila);
+    clearLCDLine(fila);
+    lcd.setCursor((RowLCD-size)/2,fila);
     lcd.print(aux);
+}
+
+void clearLCDLine(int line){
+    lcd.setCursor(0,line);
+    for(int n = 0; n < RowLCD; n++) lcd.print(" ");
 }
 
 void clear_lcd(){
